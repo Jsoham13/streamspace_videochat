@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-'use client'
+'use client';
 
 import { useGetCalls } from '@/hooks/useGetCalls'
 import { Call, CallRecording } from '@stream-io/video-react-sdk';
@@ -8,13 +8,12 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import MeetingCard from './MeetingCard';
 import Loader from './Loader';
-import { toast, useToast } from '@/hooks/use-toast';
+import { useToast } from './ui/use-toast';
 
-const CallList = ( { type }: { type: 'ended' |
-    'upcoming' | 'recordings' }) => {
-        const { endedCalls, upcomingCalls, callRecordings, isLoading } = useGetCalls();
-        const router = useRouter();
-        const [recordings, setRecordings] = useState<CallRecording[]>([])
+const CallList = ({ type }: { type: 'ended' | 'upcoming' | 'recordings' }) => {
+  const { endedCalls, upcomingCalls, isLoading, callRecordings } = useGetCalls(); // Assuming this returns data from a hook
+  const router = useRouter();
+  const [recordings, setRecordings] = useState<CallRecording[]>([]);
 
         const {toast} = useToast();
 
@@ -52,7 +51,7 @@ const CallList = ( { type }: { type: 'ended' |
                if (!callRecordings) return; // Ensure that callRecordings is not undefined
         
             const callData = await Promise.all(
-              (callRecordings ?? []).map((meeting) => meeting.queryRecordings())
+              callRecordings?.map((meeting) => meeting.queryRecordings()) ?? [],
             );
         
             const recordings = callData
@@ -89,12 +88,12 @@ const CallList = ( { type }: { type: 'ended' |
                 }
                 title={
                   (meeting as Call)?.state?.custom?.description?.substring(0, 26) ||
-                  meeting?.filename?.substring(0, 20) ||
+                  (meeting as CallRecording).filename?.substring(0, 20) ||
                   'No Description'
                 }
                 date={
                   (meeting as Call)?.state?.startsAt?.toLocaleString() || 
-                  meeting?.start_time?.toLocaleString()
+                  (meeting as CallRecording).start_time?.toLocaleString()
                 }
                 isPreviousMeeting={type === 'ended'}
                 buttonIcon1={type === 'recordings' ? '/icons/play.svg' : undefined}

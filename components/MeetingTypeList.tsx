@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import MettingModal from './MettingModal';
 import { useUser } from '@clerk/nextjs';
 import { Call, useStreamVideoClient } from '@stream-io/video-react-sdk';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from './ui/use-toast';
 import { Textarea } from './ui/textarea';
 import ReactDatePicker from 'react-datepicker'; 
 import { Input } from './ui/input';
