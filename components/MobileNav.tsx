@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import React from 'react'
 import {
-    Sheet,SheetClose,SheetContent,SheetDescription,SheetHeader,SheetTitle,SheetTrigger,
+    Sheet,SheetClose,SheetContent,SheetTrigger,
   } from "@/components/ui/sheet"
 import Image from 'next/image'
 import Link from 'next/link'
