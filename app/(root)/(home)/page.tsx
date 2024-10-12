@@ -18,25 +18,33 @@ const Home = () => {
   useEffect(() => {
     if (upcomingCalls && upcomingCalls.length > 0) {
       // Filter the meetings to find the one that is scheduled to happen next
+      const now = new Date();
+
       const upcoming = upcomingCalls
-        .filter((call: Call) => new Date(call.state.startsAt) > now) // Only future meetings
-        .sort((a: Call, b: Call) => new Date(a.state.startsAt).getTime() - new Date(b.state.startsAt).getTime()); // Sort by start time
+        .filter((call: Call) => {
+          // Ensure startsAt exists and is a valid date string/number
+          return call.state.startsAt && new Date(call.state.startsAt) > now;
+        })
+        .sort((a: Call, b: Call) => {
+          // Sort the meetings by start time
+          const dateA = a.state.startsAt ? new Date(a.state.startsAt).getTime() : Infinity;
+          const dateB = b.state.startsAt ? new Date(b.state.startsAt).getTime() : Infinity;
+          return dateA - dateB;
+        });
 
       // Set the next upcoming meeting
       setNextMeeting(upcoming[0] || null);
     }
-  }, [upcomingCalls]);
+  }, [upcomingCalls]); // Dependency on `upcomingCalls`
 
   // Format the next meeting date to "DD/MonthName HH:mm"
-  const formatNextMeetingDate = (dateString: string) => {
-    const meetingDate = new Date(dateString);
-    const optionsDate = { day: '2-digit', month: 'long' }; // "DD/MonthName"
-    const formattedDate = new Intl.DateTimeFormat('en-US', optionsDate).format(meetingDate);
-    const formattedTime = meetingDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }); // "HH:mm"
-
+  const formatNextMeetingDate = (dateObject: Date) => {
+    const optionsDate: Intl.DateTimeFormatOptions = { day: '2-digit', month: 'long' }; // "DD/MonthName"
+    const formattedDate = new Intl.DateTimeFormat('en-US', optionsDate).format(dateObject);
+    const formattedTime = dateObject.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }); // "HH:mm"
+  
     return ` ${formattedDate} - ${formattedTime}`; // Combine date and time
   };
-
 
   return (
     <section className="flex size-full flex-col gap-10 text-white">
@@ -47,7 +55,7 @@ const Home = () => {
         <div className="flex h-full flex-col justify-between max-md:px-5 max-md:py-8 lg:p-11">
           {/* Displaying the next meeting time inside the button */}
           <h2 className="glassmorphism max-w-[400px] rounded py-2 text-center text-base font-normal">
-            {nextMeeting
+            {nextMeeting && nextMeeting.state.startsAt
               ? `Upcoming Meeting at: ${formatNextMeetingDate(nextMeeting.state.startsAt)}`
               : 'Upcoming Meetings: No meetings scheduled'}
           </h2>
