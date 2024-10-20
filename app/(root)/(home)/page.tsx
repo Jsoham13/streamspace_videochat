@@ -6,13 +6,27 @@ import { useGetCalls } from '@/hooks/useGetCalls';
 import { Call } from '@stream-io/video-react-sdk'; // Assuming this is the correct import
 
 const Home = () => {
+// State for time and date
+  const [time, setTime] = useState<string>('');
+  const [date, setDate] = useState<string>('');
   const now = new Date();
-  const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-  const date = new Intl.DateTimeFormat('en-US', { dateStyle: 'full' }).format(now);
 
   // Fetch upcoming calls
   const { upcomingCalls } = useGetCalls();
   const [nextMeeting, setNextMeeting] = useState<Call | null>(null);
+
+    // Update time and date every second
+    useEffect(() => {
+      const interval = setInterval(() => {
+        const now = new Date();
+        const currentTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        const currentDate = new Intl.DateTimeFormat('en-US', { dateStyle: 'full' }).format(now);
+        setTime(currentTime);
+        setDate(currentDate);
+      }, 1000);
+  
+      return () => clearInterval(interval); // Clear interval on component unmount
+    }, []);
 
   // Get the next upcoming meeting
   useEffect(() => {
@@ -54,9 +68,9 @@ const Home = () => {
       >
         <div className="flex h-full flex-col justify-between max-md:px-5 max-md:py-8 lg:p-11">
           {/* Displaying the next meeting time inside the button */}
-          <h2 className="glassmorphism max-w-[400px] rounded py-2 text-center text-base font-normal">
+          <h2 className="glassmorphism max-w-[300px] lg:max-w-[400px] rounded py-1.5 lg:py-2 text-center text-sm lg:text-base font-normal">
             {nextMeeting && nextMeeting.state.startsAt
-              ? `Upcoming Meeting at: ${formatNextMeetingDate(nextMeeting.state.startsAt)}`
+              ? `Upcoming Meeting at: ${formatNextMeetingDate(new Date(nextMeeting.state.startsAt))}`
               : 'Upcoming Meetings: No meetings scheduled'}
           </h2>
 
